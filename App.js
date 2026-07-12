@@ -547,7 +547,7 @@ export default function App() {
       }
       if (rua || bairro || cidade) {
         const partes = [[rua, numero].filter(Boolean).join(', '), bairro, cidade].filter(Boolean);
-        setField('endereco', partes.join(', '));
+        setField('endereco', partes.join(' - '));
       } else {
         setBannerType('warn');
         setSaveModalMessage('Não foi possível identificar o endereço. Preencha manualmente.');
@@ -1398,7 +1398,7 @@ export default function App() {
             </View>
             <TextInput
               style={styles.input}
-              placeholder="Rua, número, bairro, cidade"
+              placeholder="Rua, número - bairro - cidade"
               placeholderTextColor="#9aa0b5"
               value={form.endereco}
               onChangeText={(t) => setField('endereco', t)}
