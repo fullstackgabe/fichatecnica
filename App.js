@@ -717,7 +717,7 @@ export default function App() {
         </head>
         <body>
           <div class="header">
-            <div class="title">Checklist</div>
+            <div class="title">CheckTécnico</div>
             <div class="meta">${new Date().toLocaleString()}</div>
           </div>
           <div class="card">
@@ -875,7 +875,7 @@ export default function App() {
         </head>
         <body>
           <div class="header">
-            <div class="title">Checklist</div>
+            <div class="title">CheckTécnico</div>
             <div class="meta">${new Date().toLocaleString()}</div>
           </div>
           <div class="card">
