@@ -48,3 +48,6 @@ supabase/
 
 # assets locais (apk, zip, pdfs) - nao versionar
 _assets/
+
+# Vercel
+.vercel
