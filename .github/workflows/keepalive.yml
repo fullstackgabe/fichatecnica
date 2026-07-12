@@ -15,7 +15,7 @@ jobs:
           SUPABASE_KEY: sb_publishable_QhY-bXxAoAmb8j_9JAPfXQ_Lreu9q9x
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" \
-            "$SUPABASE_URL/rest/v1/checklists?select=id&limit=1" \
+            "$SUPABASE_URL/rest/v1/fichas?select=id&limit=1" \
             -H "apikey: $SUPABASE_KEY" \
             -H "Authorization: Bearer $SUPABASE_KEY")
           echo "Supabase respondeu HTTP $code"
