@@ -1,0 +1,5 @@
+{
+  "buildCommand": "expo export --platform web && node scripts/fix-icons.js",
+  "outputDirectory": "dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
