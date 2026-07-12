@@ -408,7 +408,7 @@ export default function App() {
     }
   };
 
-  const getCurrentCoords = async () => {
+  const getCurrentCoords = async (precisa = false) => {
     if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
       let best = null;
       let finalPos = null;
@@ -418,7 +418,7 @@ export default function App() {
             (p) => {
               const acc = typeof p?.coords?.accuracy === 'number' ? p.coords.accuracy : null;
               if (!best || (acc != null && acc < (best?.coords?.accuracy ?? Infinity))) best = p;
-              if (acc != null && acc <= 30) {
+              if (acc != null && acc <= (precisa ? 15 : 30)) {
                 try { navigator.geolocation.clearWatch(wid); } catch {}
                 resolve(p);
               }
@@ -432,12 +432,13 @@ export default function App() {
           setTimeout(() => {
             try { navigator.geolocation.clearWatch(wid); } catch {}
             resolve(best);
-          }, 8000);
+          }, precisa ? 15000 : 8000);
         });
       } catch {}
       if (finalPos?.coords?.latitude && finalPos?.coords?.longitude) {
         return { lat: finalPos.coords.latitude, lng: finalPos.coords.longitude };
       }
+      if (precisa) return null;
       try {
         const ctrl = new AbortController();
         const to = setTimeout(() => ctrl.abort(), 3000);
@@ -470,10 +471,10 @@ export default function App() {
       (p) => {
         const acc = typeof p?.coords?.accuracy === 'number' ? p.coords.accuracy : null;
         if (!best || (acc != null && acc < (best?.coords?.accuracy ?? Infinity))) best = p;
-        if (acc != null && acc <= 50) resolveFn(p);
+        if (acc != null && acc <= (precisa ? 15 : 50)) resolveFn(p);
       }
     );
-    setTimeout(() => resolveFn(best), 12000);
+    setTimeout(() => resolveFn(best), precisa ? 15000 : 12000);
     const finalPos = await done;
     try { sub?.remove(); } catch {}
     if (!(finalPos?.coords?.latitude && finalPos?.coords?.longitude)) {
@@ -516,8 +517,13 @@ export default function App() {
     setIsLocating(true);
     setLocatingKey('endereco');
     try {
-      const pos = await getCurrentCoords();
-      if (!pos) return;
+      const pos = await getCurrentCoords(true);
+      if (!pos) {
+        setBannerType('warn');
+        setSaveModalMessage('Sinal de GPS fraco. Tente perto de uma janela ou preencha manualmente.');
+        setSaveModalVisible(true);
+        return;
+      }
       let rua = '', numero = '', bairro = '', cidade = '';
       if (Platform.OS === 'web') {
         const resp = await fetch(
@@ -1377,16 +1383,16 @@ export default function App() {
               spellCheck={false}
             />
 
-            <View style={styles.rowSpaceBetween}>
-              <Text style={styles.label}>🏠 Endereço</Text>
+            <View style={[styles.rowSpaceBetween, { marginTop: 4, marginBottom: 6 }]}>
+              <Text style={[styles.label, { marginTop: 0, marginBottom: 0 }]}>🏠 Endereço</Text>
               <Pressable onPress={preencherEndereco} disabled={isLocating} hitSlop={8}>
                 {isLocating && locatingKey === 'endereco' ? (
-                  <View style={[styles.row, { alignItems: 'center' }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <ActivityIndicator size="small" color="#2f6fed" />
                     <Text style={{ color: '#2f6fed', fontWeight: '700', fontSize: 13, marginLeft: 6 }}>Carregando...</Text>
                   </View>
                 ) : (
-                  <Text style={{ color: '#2f6fed', fontWeight: '700', fontSize: 13 }}>📍 Usar minha localização atual</Text>
+                  <Text style={{ color: '#2f6fed', fontWeight: '700', fontSize: 13 }}>📍 Usar localização atual</Text>
                 )}
               </Pressable>
             </View>
@@ -1449,7 +1455,7 @@ export default function App() {
                   {isLocating && locatingKey === 'locCtoLink' ? (
                 <ActivityIndicator color="#fff" style={styles.absolute} />
                   ) : null}
-                  <Text style={[styles.btnText, isLocating && locatingKey === 'locCtoLink' ? styles.opacity0 : null]}>📍 Capturar localização</Text>
+                  <Text style={[styles.btnText, isLocating && locatingKey === 'locCtoLink' ? styles.opacity0 : null]}>Capturar localização</Text>
                 </View>
               </Pressable>
             </View>
@@ -1546,7 +1552,7 @@ export default function App() {
                   {isLocating && locatingKey === 'locCasaLink' ? (
                 <ActivityIndicator color="#fff" style={styles.absolute} />
                   ) : null}
-                  <Text style={[styles.btnText, isLocating && locatingKey === 'locCasaLink' ? styles.opacity0 : null]}>📍 Capturar localização</Text>
+                  <Text style={[styles.btnText, isLocating && locatingKey === 'locCasaLink' ? styles.opacity0 : null]}>Capturar localização</Text>
                 </View>
               </Pressable>
             </View>
